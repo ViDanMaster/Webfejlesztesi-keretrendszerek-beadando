@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="product-list">
+      <h2>Termékek</h2>
+      <div class="product-grid">
+        <div class="product-card" *ngFor="let product of products">
+          <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image" />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            <span class="product-price">{{ product.price | currency:'HUF' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

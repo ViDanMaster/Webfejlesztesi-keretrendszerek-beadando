@@ -1,0 +1,42 @@
+<div class="sidebar">
+    <div class="filter-section">
+      <h3>Kategóriák</h3>
+      <ul>
+        <li>
+          <a [routerLink]="['/home']" class="filter-link" 
+             [class.active]="filters.categoryId === null"
+             (click)="onCategoryClick($event, null)">
+            {{ 'Összes termék' }}
+          </a>
+        </li>
+        <li *ngFor="let category of categories">
+          <a [routerLink]="['/home']" class="filter-link" 
+             [class.active]="filters.categoryId === category.id"
+             (click)="onCategoryClick($event, category.id)">
+            {{ category.name }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  
+    <div class="filter-section">
+      <h3>Árak</h3>
+      <div class="price-filter">
+        <div class="price-input">
+          <label for="minPrice">Min ár:</label>
+          <input type="number" id="minPrice" [(ngModel)]="filters.minPrice" 
+                 min="0" (change)="onPriceFilterChange()">
+        </div>
+        <div class="price-input">
+          <label for="maxPrice">Max ár:</label>
+          <input type="number" id="maxPrice" [(ngModel)]="filters.maxPrice" 
+                 min="0" (change)="onPriceFilterChange()">
+        </div>
+      </div>
+    </div>
+
+  
+    <button class="clear-filters-btn" (click)="clearAllFilters()">
+      Szűrők törlése
+    </button>
+  </div>

@@ -1,0 +1,19 @@
+<mat-toolbar color="primary" class="mat-elevation-z6 toolbar">
+    <div class="logo">
+      <span class="logo-text">Árukereső</span>
+    </div>
+  
+    <div class="search-container">
+      <app-search-form (search)="onSearch($event)"></app-search-form>
+    </div>
+  
+    <div class="icon-group">
+      <button mat-icon-button aria-label="Kedvencek">
+        <mat-icon>favorite</mat-icon>
+      </button>
+  
+      <button mat-icon-button aria-label="Profil">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
