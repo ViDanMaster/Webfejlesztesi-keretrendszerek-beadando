@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { FilterOptions } from '../../models/filteroptions.model';
+import { B } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-filter-sidebar',
@@ -15,20 +16,30 @@ import { FilterOptions } from '../../models/filteroptions.model';
 })
 export class FilterSidebarComponent implements OnInit {
   categories: Category[] = [];
+
+  filters: FilterOptions = {
+    categoryId: null,
+    minPrice: null,
+    maxPrice: null,
+    searchTerm: null,
+    onlyFavorites: false
+  };
   
   @Input() set searchTerm(value: string | null) {
     if (value !== this.filters.searchTerm) {
       this.filters.searchTerm = value;
     }
   }
-  
-  filters: FilterOptions = {
-    categoryId: null,
-    minPrice: null,
-    maxPrice: null,
-    searchTerm: null
-  };
 
+  @Input() set onlyFavorites(value: Boolean) {
+    if (value !== undefined) {
+      this.filters.onlyFavorites = value;
+    } else {
+      this.filters.onlyFavorites = false;
+    }
+    console.log('FilterSidebarComponent onlyFavorites:', this.filters.onlyFavorites);
+  }
+  
   @Output() filtersChanged = new EventEmitter<FilterOptions>();
   
   constructor(
@@ -61,7 +72,8 @@ export class FilterSidebarComponent implements OnInit {
       categoryId: null,
       minPrice: null,
       maxPrice: null,
-      searchTerm: null
+      searchTerm: null,
+      onlyFavorites: Boolean(false)
     };
     this.emitFilters();
   }

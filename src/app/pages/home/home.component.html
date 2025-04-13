@@ -1,15 +1,38 @@
 <div class="container">
-    <div class="product-list">
-      <h2>Termékek</h2>
-      <div class="product-grid">
-        <div class="product-card" *ngFor="let product of products">
-          <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image" />
-          <div class="product-info">
-            <h3>{{ product.name }}</h3>
+  <div class="filter-sidebar-container">
+    <app-filter-sidebar 
+      [searchTerm]="currentSearchTerm"
+      [onlyFavorites]="onlyFavoritesActive"
+      (filtersChanged)="onFiltersChanged($event)">
+    </app-filter-sidebar>
+  </div>
+  
+  <div class="product-list">
+    <h2 class="mat-headline-4">Termékek</h2>
+    
+    <div class="product-grid">
+      <ng-container *ngFor="let product of displayedProducts">
+        <mat-card class="product-card mat-elevation-z4">
+          <mat-card-header>
+            <mat-card-title>{{ product.name }}</mat-card-title>
+          </mat-card-header>
+          
+          <mat-card-content>
             <p class="product-description">{{ product.description }}</p>
-            <span class="product-price">{{ product.price | currency:'HUF' }}</span>
-          </div>
-        </div>
-      </div>
+            <p class="product-price">{{ product.price | priceFormat }}</p>
+          </mat-card-content>
+          
+          <mat-card-actions align='end'>
+            <button mat-icon-button 
+            class="favorite-button" 
+            [class.active]="product.isFavorite"
+            (click)="toggleFavorite($event, product.id)" 
+            aria-label="Kedvencekhez adás">
+              <mat-icon>favorite</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </ng-container>
     </div>
   </div>
+</div>

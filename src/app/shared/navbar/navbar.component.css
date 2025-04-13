@@ -30,7 +30,85 @@
       align-items: center;
       gap: 8px;
     }
+
+    .favorite-button{
+      color: #535353;
+    }
+
+    .favorite-button.active {
+      color: #e91e63;
+    }
+
+    .profile-button {
+      color: #535353;
+    }
   
   .content-container {
     padding: 16px;
+  }
+  
+  button.active {
+    color: #ffc107;
+  }
+  
+  .logo-link {
+    cursor: pointer;
+  }
+
+  .user-button {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: 2px 6px;
+    transition: all 0.3s ease;
+  }
+
+  .user-button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .user-button span {
+    margin-right: 8px;
+  }
+
+  .user-button mat-icon {
+    margin-left: 4px;
+  }
+  
+.user-name{
+  color: #535353;
+}
+
+.user-icon{
+  color: #535353;
+}
+
+  ::ng-deep .logout-item {
+    border-radius: 8px !important;
+    margin: 8px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 10px;
+    border: 1px solid #d6d6d6;
+    background-color: #f5f5f5 !important;
+    color: #535353 !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  ::ng-deep .logout-item:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    transform: scale(1.03) !important;
+  }
+  
+  ::ng-deep .mat-mdc-menu-panel {
+    border-radius: 12px !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+    padding: 6px !important;
+  }
+  
+  ::ng-deep .mat-mdc-menu-content {
+    padding: 0 !important;
   }

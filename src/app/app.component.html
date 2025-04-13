@@ -1,11 +1,4 @@
-<app-navbar (search)="onSearch($event)"></app-navbar>
-
+<app-navbar (search)="onSearch($event)" (toggleFavoritesFilter)="onToggleFavoritesFilter()"></app-navbar>
 <div class="main-layout">
-  <app-filter-sidebar 
-    [searchTerm]="currentSearchTerm"
-    (filtersChanged)="onFiltersChanged($event)">
-  </app-filter-sidebar>
-  <div class="main-content">
-    <app-home [selectedCategory]="selectedCategory" [products]="filteredProducts"></app-home>
-  </div>
+    <router-outlet></router-outlet>
 </div>

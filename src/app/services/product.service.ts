@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Product } from '../models/product.model';
 import { FilterOptions } from '../models/filteroptions.model';
+import { FavoriteService } from './favorite.service';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +41,7 @@ export class ProductService {
   ];
   
 
-  constructor() {}
+  constructor(private favoriteService : FavoriteService) {}
 
   getProducts(): Observable<Product[]> {
     return of(this.products);
@@ -77,6 +78,11 @@ export class ProductService {
       filteredProducts = filteredProducts.filter(product => 
         product.price <= filters.maxPrice!
       );
+    }
+
+    if (filters.onlyFavorites) {
+      const favIds = this.favoriteService.getFavoriteProductIds();
+      filteredProducts = filteredProducts.filter(p => favIds.includes(p.id));
     }
     
     return of(filteredProducts);
