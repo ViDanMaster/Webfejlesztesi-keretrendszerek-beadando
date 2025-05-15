@@ -98,7 +98,7 @@ export class ProductFormComponent implements OnInit {
     if (this.isEditMode && this.productId) {
       // Update existing product
       const product: Product = {
-        id: this.productId,
+        id: this.productId?.toString() || '', // Konvertálás string-gé
         name: formValue.name,
         description: formValue.description,
         price: formValue.price,
@@ -117,7 +117,7 @@ export class ProductFormComponent implements OnInit {
     } else {
       // Create new product with temporary ID (will be replaced by Firestore)
       const product: Product = {
-        id: 0, // Temporary, will be set by Firestore
+        id: '', // Üres string, ami majd felülíródik a Firestore által generált ID-val
         name: formValue.name,
         description: formValue.description,
         price: formValue.price,

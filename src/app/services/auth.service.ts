@@ -5,7 +5,8 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  UserCredential
+  UserCredential,
+  updateEmail
 } from '@angular/fire/auth';
 import { doc, setDoc, Firestore } from '@angular/fire/firestore';
 import { Observable, from, of, BehaviorSubject, catchError } from 'rxjs';
@@ -158,5 +159,35 @@ export class AuthService {
   // Check if user is logged in
   isLoggedIn(): boolean {
     return !!this.currentUserSubject.value;
+  }
+
+  updateUserEmail(newEmail: string) {
+    return new Observable<void>((observer) => {
+      if (!this.auth.currentUser) {
+        observer.error('No authenticated user found');
+        return;
+      }
+      
+      // First, verify the user's current credentials (optional but recommended)
+      // This would require getting the password from the user
+
+      // Send verification email to the new email address
+      const user = this.auth.currentUser;
+      
+      // Using verifyBeforeUpdateEmail instead of updateEmail
+      // This sends a verification email to the new address
+      import('firebase/auth').then(({ verifyBeforeUpdateEmail }) => {
+        verifyBeforeUpdateEmail(user, newEmail)
+          .then(() => {
+            observer.next();
+            observer.complete();
+          })
+          .catch((error) => {
+            observer.error(error);
+          });
+      }).catch(error => {
+        observer.error(error);
+      });
+    });
   }
 }

@@ -61,6 +61,19 @@
     text-decoration: none;
   }
   
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header-row button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
   @media (max-width: 768px) {
     .container {
       flex-direction: column;

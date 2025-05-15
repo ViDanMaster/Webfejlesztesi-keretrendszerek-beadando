@@ -1,4 +1,4 @@
-<div class="product-details-container" *ngIf="product">
+<div class="product-details-container" *ngIf="product && !isLoading && !hasError">
   <div class="product-main">
     <div class="product-image-container">
       <img [src]="product.imageUrl" [alt]="product.name" class="product-image">
@@ -6,25 +6,14 @@
     
     <div class="product-info">
       <h1>{{product.name}}</h1>
-      
-      <div class="product-category" *ngIf="category">
-        <a [routerLink]="['/home']" [queryParams]="{category: category.id}">
-          {{category.name}}
-        </a>
-      </div>
-      
-      <div class="product-price">
-        {{product.price | currency:'HUF'}}
-      </div>
-      
-      <p class="product-description">
-        {{product.description}}
-      </p>
-      
+      <p class="product-description">{{product.description}}</p>
+      <p class="product-price">{{product.price | currency:'HUF'}}</p>
+      <p *ngIf="category" class="product-category">Kategória: {{category.name}}</p>
+
       <div class="product-actions">
-        <button mat-raised-button color="primary">Kosárba</button>
-        <button mat-icon-button>
-          <mat-icon>favorite_border</mat-icon>
+        <button mat-raised-button color="accent">
+          <mat-icon>favorite</mat-icon>
+          Kedvencekhez
         </button>
       </div>
     </div>
@@ -33,35 +22,7 @@
   <mat-divider></mat-divider>
   
   <div class="reviews-section">
-    <h2>Értékelések</h2>
-    
-    <div class="new-review" *ngIf="isLoggedIn">
-      <h3>Írj értékelést</h3>
-      <div class="rating-input">
-        <label>Értékelés:</label>
-        <mat-form-field appearance="fill">
-          <mat-select [(ngModel)]="newReview.rating">
-            <mat-option [value]="1">1 csillag</mat-option>
-            <mat-option [value]="2">2 csillag</mat-option>
-            <mat-option [value]="3">3 csillag</mat-option>
-            <mat-option [value]="4">4 csillag</mat-option>
-            <mat-option [value]="5">5 csillag</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      
-      <mat-form-field appearance="fill" class="comment-input">
-        <textarea matInput [(ngModel)]="newReview.comment" placeholder="Véleményed..."></textarea>
-      </mat-form-field>
-      
-      <button mat-raised-button color="primary" (click)="addReview()">Küldés</button>
-    </div>
-    
-    <div *ngIf="!isLoggedIn" class="login-prompt">
-      <p>Jelentkezz be, hogy értékelést írhass!</p>
-      <button mat-raised-button color="primary" routerLink="/login">Bejelentkezés</button>
-    </div>
-    
+    <h2>Vélemények</h2>
     <div class="reviews-list">
       <mat-card *ngFor="let review of reviews" class="review-card">
         <mat-card-header>
@@ -86,6 +47,16 @@
   </div>
 </div>
 
-<div class="loading" *ngIf="!product">
+<div class="loading" *ngIf="isLoading">
+  <mat-icon>hourglass_empty</mat-icon>
   <p>Termék betöltése...</p>
+</div>
+
+<div class="error-container" *ngIf="hasError">
+  <mat-icon color="warn">error</mat-icon>
+  <h2>Hiba történt</h2>
+  <p>{{ errorMessage }}</p>
+  <button mat-raised-button color="primary" routerLink="/home">
+    Vissza a főoldalra
+  </button>
 </div>

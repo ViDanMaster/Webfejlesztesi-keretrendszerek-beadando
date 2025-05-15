@@ -44,7 +44,7 @@ export class ReviewService {
   }
 
   // READ
-  getReviewsByProduct(productId: number): Observable<Review[]> {
+  getReviewsByProduct(productId: string): Observable<Review[]> {
     const q = query(
       this.reviewsCollection,
       where('productId', '==', productId),
@@ -89,7 +89,7 @@ export class ReviewService {
           }
           acc[review.productId].push(review);
           return acc;
-        }, {} as { [key: number]: Review[] });
+        }, {} as { [key: string]: Review[] });
         
         // Calculate average ratings
         const productRatings = Object.keys(productReviews).map(productId => {

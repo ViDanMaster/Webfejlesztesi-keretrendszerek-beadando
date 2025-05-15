@@ -3,6 +3,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { SearchFormComponent } from '../search-form/search-form.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -15,7 +16,8 @@ import { AuthService } from '../../services/auth.service';
     MatToolbar, 
     SearchFormComponent, 
     MatIcon, 
-    MatButtonModule, 
+    MatButtonModule,
+    MatTooltipModule,
     RouterModule
   ],
   standalone: true,
