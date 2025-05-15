@@ -1,0 +1,70 @@
+<div class="auth-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Regisztráció</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill">
+          <mat-label>Név</mat-label>
+          <input matInput formControlName="name" placeholder="Teljes név">
+          <mat-error *ngIf="registerForm.get('name')?.errors?.['required']">
+            A név megadása kötelező
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('name')?.errors?.['minlength']">
+            A névnek legalább 3 karakter hosszúnak kell lennie
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="pelda@email.com">
+          <mat-error *ngIf="registerForm.get('email')?.errors?.['required']">
+            Az email megadása kötelező
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.errors?.['email']">
+            Érvényes email címet adjon meg
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Jelszó</mat-label>
+          <input matInput formControlName="password" type="password">
+          <mat-error *ngIf="registerForm.get('password')?.errors?.['required']">
+            A jelszó megadása kötelező
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('password')?.errors?.['minlength']">
+            A jelszónak legalább 6 karakter hosszúnak kell lennie
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Jelszó megerősítése</mat-label>
+          <input matInput formControlName="confirmPassword" type="password">
+          <mat-error *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">
+            A jelszó megerősítése kötelező
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-error *ngIf="registerForm.errors?.['passwordMismatch']">
+          A két jelszó nem egyezik
+        </mat-error>
+        
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary" [disabled]="registerForm.invalid">
+            Regisztráció
+          </button>
+        </div>
+        
+        <div class="login-prompt">
+          Már van fiókja? <a routerLink="/login">Bejelentkezés</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

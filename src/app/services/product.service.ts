@@ -1,84 +1,174 @@
+// filepath: c:\Users\vizid\Desktop\Angular\beadando\src\app\Services\Product.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, from, map, of } from 'rxjs';
 import { Product } from '../models/product.model';
 import { FilterOptions } from '../models/filteroptions.model';
+import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, getDocs, setDoc } from '@angular/fire/firestore'; // Ensure all are imported
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private products: Product[] = [
-    new Product(1, 'Samsung Galaxy S21', 'Okostelefon 8GB RAM-mal', 250000, 1, 'assets/samsung-galaxy-s21.jpg'),
-    new Product(4, 'Sony TV', '55 inches 4K UHD televízió', 100000, 1, 'assets/sony-tv.jpg'),
-    new Product(7, 'Apple MacBook Air', 'M2 chip, 256GB SSD, 8GB RAM', 450000, 1, 'assets/macbook-air.jpg'),
-    new Product(8, 'JBL Bluetooth hangszóró', 'Vezeték nélküli hangszóró erőteljes hangzással', 30000, 1, 'assets/jbl-speaker.jpg'),
-    new Product(26, 'Laptoptáska', 'Divatos táska laptophoz', 15000, 1, 'assets/laptoptaska.jpg'),
-  
-    new Product(2, 'Nike Air Max', 'Kényelmes futócipő', 35000, 2, 'assets/nike-air-max.jpg'),
-    new Product(9, 'Adidas melegítő', 'Kényelmes szett sportoláshoz', 28000, 2, 'assets/adidas-melegito.jpg'),
-    new Product(10, 'Téli kabát', 'Meleg, vízálló kabát hideg napokra', 40000, 2, 'assets/teli-kabat.jpg'),
-    new Product(18, 'Farmer nadrág', 'Klasszikus kék farmer', 15000, 2, 'assets/farmer.jpg'),
-    new Product(19, 'Napszemüveg', 'UV szűrős divatos napszemüveg', 7000, 2, 'assets/napszemuveg.jpg'),
-  
-    new Product(11, 'Bio alma', 'Friss, ropogós bio alma (1kg)', 800, 3, 'assets/bio-alma.jpg'),
-    new Product(12, 'Kávé kapszula', 'Intenzív ízű eszpresszó kapszulák (10db)', 1500, 3, 'assets/kave-kapszula.jpg'),
-    new Product(20, 'Teljes kiőrlésű kenyér', 'Egészséges, friss pékáru (500g)', 600, 3, 'assets/kenyer.jpg'),
-    new Product(21, 'Narancslé', '100%-os gyümölcslé, 1L', 900, 3, 'assets/narancsle.jpg'),
-    new Product(27, 'Mozzarella sajt', 'Olasz mozzarella, 125g', 1100, 3, 'assets/mozzarella.jpg'),
-  
-    new Product(5, 'Asztal', 'Modern étkezőasztal', 50000, 4, 'assets/asztal.jpg'),
-    new Product(13, 'Állólámpa', 'Modern dizájn, meleg fény', 20000, 4, 'assets/allolampa.jpg'),
-    new Product(14, 'Ágynemű garnitúra', '4 részes pamut ágynemű szett', 12000, 4, 'assets/agynemu.jpg'),
-    new Product(22, 'Függöny szett', 'Elegáns sötétítő függönyök (2db)', 18000, 4, 'assets/fuggony.jpg'),
-    new Product(23, 'Konyhai robotgép', 'Többfunkciós konyhai segédeszköz', 35000, 4, 'assets/robotgep.jpg'),
-  
-    new Product(6, 'Futball labda', 'Tökéletes focizáshoz', 10000, 5, 'assets/futball-labda.jpg'),
-    new Product(15, 'Jógamatrac', 'Csúszásmentes és kényelmes', 6000, 5, 'assets/jogamatrac.jpg'),
-    new Product(16, 'Kerékpáros sisak', 'Könnyű és biztonságos fejvédő', 18000, 5, 'assets/kerekparos-sisak.jpg'),
-    new Product(24, 'Súlyzókészlet', 'Kézi súlyzók, 2x5kg', 12000, 5, 'assets/sulyzok.jpg'),
-    new Product(25, 'Futóóra', 'Pulzusmérős, GPS-es okosóra', 27000, 5, 'assets/futora.jpg'),
-  ];
-  
+  // private productsCollection; // Ezt a sort távolítsd el vagy kommentezd ki
 
-  constructor() {}
+  constructor(private firestore: Firestore) {
+    // this.productsCollection = collection(this.firestore, 'products'); // Ezt a sort távolítsd el vagy kommentezd ki
+    // this.seedProducts(); // Ha használtad a seedelést, győződj meg róla, hogy a this.firestore elérhető
+  }
 
+  // CREATE
+  addProduct(product: Product): Observable<Product> {
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const newProduct = { ...product };
+    // Fontos: A Firestore dokumentum ID-k stringek. Ha a Product modelled 'id'-je szám,
+    // akkor itt konverziós problémák lehetnek, vagy a modellt kell string ID-re módosítani.
+    // Az egyszerűség kedvéért feltételezzük, hogy a Firestore generálja az ID-t.
+    const productData = {
+      name: newProduct.name,
+      description: newProduct.description,
+      price: newProduct.price,
+      categoryId: newProduct.categoryId,
+      imageUrl: newProduct.imageUrl
+    };
+    return from(addDoc(productsCollectionRef, productData)).pipe(
+      map(docRef => {
+        return {
+          ...newProduct, // Ez tartalmazhatja az eredeti, ideiglenes ID-t
+          id: docRef.id // Ez a Firestore által generált string ID
+        } as unknown as Product; // Figyelj a típuskonverzióra, ha a Product.id szám
+      })
+    );
+  }
+
+  // READ
   getProducts(): Observable<Product[]> {
-    return of(this.products);
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    return collectionData(productsCollectionRef, { idField: 'id' }) as Observable<Product[]>;
   }
 
+  getProduct(id: number | string): Observable<Product | undefined> { // Az ID lehet string is
+    const productDocRef = doc(this.firestore, `products/${id}`);
+    return from(getDoc(productDocRef)).pipe(
+      map(docSnapshot => {
+        if (docSnapshot.exists()) {
+          // Ha a Product.id szám, de a docSnapshot.id string, konvertálni kell, vagy a modellt módosítani
+          return { id: docSnapshot.id, ...docSnapshot.data() } as unknown as Product;
+        }
+        return undefined;
+      })
+    );
+  }
+
+  // UPDATE
+  updateProduct(product: Product): Observable<void> {
+    // Győződj meg róla, hogy product.id string, ha a Firestore dokumentum ID-jével dolgozol
+    const productDocRef = doc(this.firestore, `products/${product.id}`);
+    const productData = {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        categoryId: product.categoryId,
+        imageUrl: product.imageUrl
+    };
+    return from(updateDoc(productDocRef, productData));
+  }
+
+  // DELETE
+  deleteProduct(id: number | string): Observable<void> { // Az ID lehet string is
+    const productDocRef = doc(this.firestore, `products/${id}`);
+    return from(deleteDoc(productDocRef));
+  }
+
+  // COMPLEX QUERY 1: Get products by category with ordering
   getProductsByCategory(categoryId: number): Observable<Product[]> {
-    return of(this.products.filter(product => product.categoryId === categoryId));
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const q = query(
+      productsCollectionRef,
+      where('categoryId', '==', categoryId),
+      orderBy('price', 'asc')
+    );
+    return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
   }
 
+  // COMPLEX QUERY 2: Filtered products with multiple conditions
   getFilteredProducts(filters: FilterOptions): Observable<Product[]> {
-    let filteredProducts = [...this.products];
-    
-    if (filters.searchTerm) {
-      const term = filters.searchTerm.toLowerCase().trim();
-      filteredProducts = filteredProducts.filter(product => 
-        product.name.toLowerCase().includes(term) || 
-        product.description.toLowerCase().includes(term)
-      );
-    }
-    
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    let q = query(productsCollectionRef);
+
     if (filters.categoryId !== null) {
-      filteredProducts = filteredProducts.filter(product => 
-        product.categoryId === filters.categoryId
-      );
+      q = query(q, where('categoryId', '==', filters.categoryId));
     }
-    
     if (filters.minPrice !== null) {
-      filteredProducts = filteredProducts.filter(product => 
-        product.price >= filters.minPrice!
-      );
+      q = query(q, where('price', '>=', filters.minPrice));
     }
-    
     if (filters.maxPrice !== null) {
-      filteredProducts = filteredProducts.filter(product => 
-        product.price <= filters.maxPrice!
+      q = query(q, where('price', '<=', filters.maxPrice));
+    }
+    q = query(q, orderBy('price', 'asc'));
+
+    return collectionData(q, { idField: 'id' }).pipe(
+      map(products => {
+        let result = products as Product[];
+        if (filters.searchTerm) {
+          const term = filters.searchTerm.toLowerCase().trim();
+          result = result.filter(product =>
+            product.name.toLowerCase().includes(term) ||
+            product.description.toLowerCase().includes(term)
+          );
+        }
+        return result;
+      })
+    );
+  }
+
+  // COMPLEX QUERY 3: Get paginated products
+  getPaginatedProducts(pageSize: number, lastVisible?: any): Observable<{products: Product[], lastVisible: any}> {
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    let q;
+    if (lastVisible) {
+      q = query(
+        productsCollectionRef,
+        orderBy('name'),
+        startAfter(lastVisible),
+        limit(pageSize)
+      );
+    } else {
+      q = query(
+        productsCollectionRef,
+        orderBy('name'),
+        limit(pageSize)
       );
     }
-    
-    return of(filteredProducts);
+    return from(getDocs(q)).pipe(
+      map(snapshot => {
+        const products: Product[] = [];
+        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        snapshot.forEach(docSnapshot => { // Renamed 'doc' to 'docSnapshot'
+          products.push({ id: docSnapshot.id, ...docSnapshot.data() } as unknown as Product);
+        });
+        return { products, lastVisible: lastDoc };
+      })
+    );
   }
+
+  // COMPLEX QUERY 4: Get products with price range and sort order
+  getProductsInPriceRangeWithSort(
+    minPrice: number,
+    maxPrice: number,
+    sortField: string = 'price',
+    sortDirection: 'asc' | 'desc' = 'asc',
+    limitCount: number = 10
+  ): Observable<Product[]> {
+    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const q = query(
+      productsCollectionRef,
+      where('price', '>=', minPrice),
+      where('price', '<=', maxPrice),
+      orderBy(sortField, sortDirection),
+      limit(limitCount)
+    );
+    return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
+  }
+
+
 }

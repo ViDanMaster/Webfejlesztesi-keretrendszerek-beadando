@@ -1,0 +1,47 @@
+<div class="auth-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Bejelentkezés</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="pelda@email.com">
+          <mat-error *ngIf="loginForm.get('email')?.errors?.['required']">
+            Az email megadása kötelező
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.errors?.['email']">
+            Érvényes email címet adjon meg
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Jelszó</mat-label>
+          <input matInput formControlName="password" type="password">
+          <mat-error *ngIf="loginForm.get('password')?.errors?.['required']">
+            A jelszó megadása kötelező
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('password')?.errors?.['minlength']">
+            A jelszónak legalább 6 karakter hosszúnak kell lennie
+          </mat-error>
+        </mat-form-field>
+        
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">
+            Bejelentkezés
+          </button>
+        </div>
+        
+        <div class="register-prompt">
+          Nincs még fiókja? <a routerLink="/register">Regisztráció</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

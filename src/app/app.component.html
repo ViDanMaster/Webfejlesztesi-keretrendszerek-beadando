@@ -1,6 +1,6 @@
 <app-navbar (search)="onSearch($event)"></app-navbar>
 
-<div class="main-layout">
+<div class="main-layout" *ngIf="isHomePage">
   <app-filter-sidebar 
     [searchTerm]="currentSearchTerm"
     (filtersChanged)="onFiltersChanged($event)">
@@ -9,3 +9,6 @@
     <app-home [selectedCategory]="selectedCategory" [products]="filteredProducts"></app-home>
   </div>
 </div>
+
+<router-outlet *ngIf="!isHomePage"></router-outlet>
+

@@ -1,0 +1,80 @@
+<div class="profile-container" *ngIf="user">
+  <h1>Felhasználói profil</h1>
+  
+  <mat-tab-group>
+    <mat-tab label="Profil">
+      <div class="profile-form">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Személyes adatok</mat-card-title>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <form [formGroup]="userForm" (ngSubmit)="saveProfile()">
+              <mat-form-field appearance="fill">
+                <mat-label>Név</mat-label>
+                <input matInput formControlName="name">
+                <mat-error *ngIf="userForm.get('name')?.errors?.['required']">
+                  A név megadása kötelező
+                </mat-error>
+              </mat-form-field>
+              
+              <mat-form-field appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email">
+                <mat-error *ngIf="userForm.get('email')?.errors?.['required']">
+                  Az email megadása kötelező
+                </mat-error>
+                <mat-error *ngIf="userForm.get('email')?.errors?.['email']">
+                  Érvényes email címet adjon meg
+                </mat-error>
+              </mat-form-field>
+              
+              <div class="form-actions">
+                <button type="submit" mat-raised-button color="primary" [disabled]="userForm.invalid">
+                  Mentés
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+        
+        <mat-card class="logout-card">
+          <mat-card-content>
+            <button mat-button color="warn" (click)="logout()">Kijelentkezés</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+    
+    <mat-tab label="Legjobb termékek">
+      <div class="top-products">
+        <h2>Legjobb értékelésű termékek</h2>
+        
+        <div class="products-grid">
+          <mat-card *ngFor="let item of topRatedProducts" class="product-card">
+            <img [src]="item.product.imageUrl" [alt]="item.product.name" class="product-image">
+            
+            <div class="product-info">
+              <h3>
+                <a [routerLink]="['/products', item.product.id]">{{item.product.name}}</a>
+              </h3>
+              
+              <div class="rating">
+                <mat-icon *ngFor="let star of getStarArray(item.rating)" class="star-icon">star</mat-icon>
+                <mat-icon *ngFor="let star of getEmptyStarArray(item.rating)" class="star-icon">star_border</mat-icon>
+                <span class="rating-value">{{item.rating | number:'1.1-1'}}</span>
+              </div>
+              
+              <span class="product-price">{{item.product.price | currency:'HUF'}}</span>
+            </div>
+          </mat-card>
+          
+          <div *ngIf="topRatedProducts.length === 0" class="no-products">
+            <p>Még nincsenek értékelt termékek.</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

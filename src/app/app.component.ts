@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,7 @@ import { FilterSidebarComponent } from './shared/filter-sidebar/filter-sidebar.c
 import { Product } from './models/product.model';
 import { ProductService } from './services/product.service';
 import { FilterOptions } from './models/filteroptions.model';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -33,11 +34,12 @@ import { FilterOptions } from './models/filteroptions.model';
   standalone: true,
   templateUrl: './app.component.html',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'beadando';
   filteredProducts: Product[] = [];
   selectedCategory: number | null = null;
   currentSearchTerm: string | null = null;
+  isHomePage = true; // Track if we're on the home page
   
   currentFilters: FilterOptions = {
     categoryId: null,
@@ -47,10 +49,22 @@ export class AppComponent {
   };
 
   constructor(
+    private router: Router,
     private productService: ProductService,
     private cdr: ChangeDetectorRef
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.loadAllProducts();
+    
+    // Monitor route changes
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      // Check if we're on the home page
+      this.isHomePage = event.url === '/' || event.url === '/home';
+      this.cdr.detectChanges();
+    });
   }
 
   private loadAllProducts(): void {
@@ -67,12 +81,9 @@ export class AppComponent {
     this.productService.getFilteredProducts(filters).subscribe(products => {
       this.filteredProducts = products;
     });
-
-    console.log('Filters changed:', filters);
   }
 
   onSearch(searchTerm: string): void {
-    console.log('AppComponent received search term:', searchTerm);
     this.currentSearchTerm = searchTerm;
     
     const updatedFilters: FilterOptions = {
@@ -82,6 +93,11 @@ export class AppComponent {
     
     this.onFiltersChanged(updatedFilters);
     this.cdr.detectChanges();
+    
+    // Navigate to home when searching
+    if (!this.isHomePage) {
+      this.router.navigate(['/home']);
+    }
   }
 
   onCategorySelect(categoryId: number | null): void {

@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="mat-elevation-z6 toolbar">
     <div class="logo">
-      <span class="logo-text">Árukereső</span>
+      <span class="logo-text" routerLink="/home">Árukereső</span>
     </div>
   
     <div class="search-container">
@@ -8,12 +8,20 @@
     </div>
   
     <div class="icon-group">
-      <button mat-icon-button aria-label="Kedvencek">
+      <button mat-icon-button aria-label="Kedvencek" routerLink="/profile">
         <mat-icon>favorite</mat-icon>
       </button>
   
-      <button mat-icon-button aria-label="Profil">
+      <button *ngIf="isLoggedIn" mat-icon-button aria-label="Profil" routerLink="/profile">
         <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <button *ngIf="!isLoggedIn" mat-button aria-label="Bejelentkezés" routerLink="/login">
+        Bejelentkezés
+      </button>
+
+      <button *ngIf="isLoggedIn" mat-button aria-label="Kijelentkezés" (click)="logout()">
+        Kijelentkezés
       </button>
     </div>
   </mat-toolbar>
