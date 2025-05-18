@@ -1,6 +1,6 @@
 export class Product {
   constructor(
-    public id: number,
+    public id: string, // Módosítsd string vagy number típusra
     public name: string,
     public description: string,
     public price: number,

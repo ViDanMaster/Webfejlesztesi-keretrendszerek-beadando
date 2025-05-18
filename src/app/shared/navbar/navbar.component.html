@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="mat-elevation-z6 toolbar">
     <div class="logo">
-      <span routerLink="/" class="logo-link">ÁruKereső</span>
+      <span class="logo-text" routerLink="/home">Árukereső</span>
     </div>
   
     <div class="search-container">
@@ -8,36 +8,17 @@
     </div>
   
     <div class="icon-group">
-      <ng-container *ngIf="isOnHomePage">
-        <button mat-icon-button aria-label="Kedvencek" (click)="onFavoritesClick()">
-          <mat-icon
-            class="favorite-button"
-            aria-hidden="false"
-            matBadge="{{ favoriteCount }}"
-            [class.active]="showingFavorites"
-            matBadgeColor="accent"
-            [matBadgeHidden]="favoriteCount === 0"
-            >favorite</mat-icon>
-        </button>
-      </ng-container>
   
-      <ng-container *ngIf="currentUser; else notLoggedIn">
-        <button mat-button [matMenuTriggerFor]="userMenu">
-          <span class="user-name">{{ currentUser.firstName }}</span>
-          <mat-icon class="user-icon">account_circle</mat-icon>
-        </button>
-        <mat-menu #userMenu="matMenu">
-          <!--<button mat-menu-item routerLink="/profile">Profilom</button>-->
-          <button mat-menu-item class="logout-item" (click)="logout()">
-            <mat-icon>exit_to_app</mat-icon>
-            Kijelentkezés
-          </button>
-        </mat-menu>
-      </ng-container>
-      
-      <ng-template #notLoggedIn>
-        <button mat-button routerLink="/login">Bejelentkezés</button>
-        <button mat-button routerLink="/register">Regisztráció</button>
-      </ng-template>
+      <button *ngIf="isLoggedIn" mat-icon-button aria-label="Profil" routerLink="/profile">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <button *ngIf="!isLoggedIn" mat-button aria-label="Bejelentkezés" routerLink="/login">
+        Bejelentkezés
+      </button>
+
+      <button *ngIf="isLoggedIn" mat-button aria-label="Kijelentkezés" (click)="logout()">
+        Kijelentkezés
+      </button>
     </div>
   </mat-toolbar>

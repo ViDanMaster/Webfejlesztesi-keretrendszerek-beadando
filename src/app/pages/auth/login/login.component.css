@@ -1,0 +1,51 @@
+.auth-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+mat-card {
+  padding: 24px;
+}
+
+mat-card-title {
+  margin-bottom: 24px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.form-actions button {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  text-align: center;
+}
+
+.register-prompt {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.register-prompt a {
+  color: #3f51b5;
+  text-decoration: none;
+}
+
+.register-prompt a:hover {
+  text-decoration: underline;
+}

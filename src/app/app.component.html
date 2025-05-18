@@ -1,4 +1,13 @@
-<app-navbar (search)="onSearch($event)" (toggleFavoritesFilter)="onToggleFavoritesFilter()"></app-navbar>
-<div class="main-layout">
-    <router-outlet></router-outlet>
+<app-navbar (search)="onSearch($event)"></app-navbar>
+
+<div class="main-layout" *ngIf="isHomePage">
+  <app-filter-sidebar 
+    [searchTerm]="currentSearchTerm"
+    (filtersChanged)="onFiltersChanged($event)">
+  </app-filter-sidebar>
+  <div class="main-content">
+    <app-home [selectedCategory]="selectedCategory" [products]="filteredProducts"></app-home>
+  </div>
 </div>
+
+<router-outlet *ngIf="!isHomePage"></router-outlet>

@@ -1,0 +1,123 @@
+<div class="product-details-container" *ngIf="product && !isLoading && !hasError">
+  <div class="product-main">
+    <div class="product-image-container">
+      <img [src]="product.imageUrl" [alt]="product.name" class="product-image">
+    </div>
+    
+    <div class="product-info">
+      <h1>{{product.name}}</h1>
+      <p class="product-description">{{product.description}}</p>
+      <p class="product-price">{{product.price | currency:'HUF'}}</p>
+      <p *ngIf="category" class="product-category">Kategória: {{category.name}}</p>
+
+      <div class="product-actions">
+        <button mat-raised-button color="accent" (click)="toggleReviewForm()">
+          <mat-icon>star</mat-icon>
+          Értékelés
+        </button>
+        <button mat-raised-button color="primary" (click)="editProduct()">
+          <mat-icon>edit</mat-icon>
+          Szerkesztés
+        </button>
+        <button mat-raised-button color="warn" (click)="confirmDelete()">
+          <mat-icon>delete</mat-icon>
+          Törlés
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <mat-divider></mat-divider>
+  
+  <div class="new-review-form" *ngIf="showReviewForm">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Értékelés írása</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+          <div class="rating-selection">
+            <mat-label>Értékelés:</mat-label>
+            <div class="rating-stars-input">
+              <mat-icon 
+                *ngFor="let i of [1,2,3,4,5]" 
+                (click)="reviewForm.get('rating')?.setValue(i)"
+                [class.selected]="reviewForm.get('rating')?.value >= i"
+              >
+                {{reviewForm.get('rating')?.value >= i ? 'star' : 'star_border'}}
+              </mat-icon>
+            </div>
+          </div>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Vélemény</mat-label>
+            <textarea matInput formControlName="comment" rows="4" placeholder="Írja le a véleményét a termékről..."></textarea>
+            <mat-error *ngIf="reviewForm.get('comment')?.hasError('required')">A vélemény megadása kötelező</mat-error>
+            <mat-error *ngIf="reviewForm.get('comment')?.hasError('minlength')">A véleménynek legalább 3 karakter hosszúnak kell lennie</mat-error>
+          </mat-form-field>
+          
+          <div class="form-actions">
+            <button mat-button type="button" (click)="cancelReview()">Mégsem</button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="reviewForm.invalid || isSubmittingReview"
+            >
+              <mat-icon>send</mat-icon>
+              Küldés
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  
+  <div class="reviews-section">
+    <h2>Vélemények</h2>
+    <div class="reviews-list">
+      <mat-card *ngFor="let review of reviews" class="review-card">
+        <mat-card-header>
+          <div mat-card-avatar class="user-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <mat-card-title>
+            {{ review.userName || 'Névtelen felhasználó' }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            <div class="rating-stars">
+              <mat-icon *ngFor="let star of getStarArray(review.rating)">star</mat-icon>
+              <mat-icon *ngFor="let star of getEmptyStarArray(review.rating)">star_border</mat-icon>
+            </div>
+            <div class="review-date">
+              {{review.date | date:'yyyy. MM. dd.'}}
+            </div>
+          </mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <p class="review-comment">{{review.comment}}</p>
+        </mat-card-content>
+      </mat-card>
+      
+      <div *ngIf="reviews.length === 0" class="no-reviews">
+        <p>Még nincsenek értékelések ehhez a termékhez.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading" *ngIf="isLoading">
+  <mat-icon>hourglass_empty</mat-icon>
+  <p>Termék betöltése...</p>
+</div>
+
+<div class="error-container" *ngIf="hasError">
+  <mat-icon color="warn">error</mat-icon>
+  <h2>Hiba történt</h2>
+  <p>{{ errorMessage }}</p>
+  <button mat-raised-button color="primary" routerLink="/home">
+    Vissza a főoldalra
+  </button>
+</div>

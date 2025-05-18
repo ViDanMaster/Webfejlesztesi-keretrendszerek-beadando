@@ -1,30 +1,62 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, from, map } from 'rxjs';
 import { Category } from '../models/category.model';
+import { Firestore, CollectionReference, DocumentData, collection, collectionData, doc, setDoc, addDoc, deleteDoc, updateDoc, getDoc, query, orderBy } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private categories: Category[] = [
-    new Category(1, 'Elektronika', 'Mindenféle elektronikai termék'),
-    new Category(2, 'Ruha', 'Divatos ruhák és kiegészítők'),
-    new Category(3, 'Élelmiszer', 'Friss élelmiszerek és italok'),
-    new Category(4, 'Otthon', 'Bútorok és lakberendezési termékek'),
-    new Category(5, 'Sport', 'Sporteszközök és ruházat'),
-  ];
+  private categoriesCollection: CollectionReference<DocumentData>;
 
-  constructor() {}
+  constructor(private firestore: Firestore) {
+    this.categoriesCollection = collection(this.firestore, 'categories');
+  }
+
+  addCategory(category: Category): Observable<Category> {
+    const newCategory = { ...category };
+    const categoryData = {
+        name: newCategory.name,
+        description: newCategory.description
+    };
+    return from(addDoc(this.categoriesCollection, categoryData)).pipe(
+      map(docRef => {
+        return {
+          ...newCategory,
+          id: docRef.id
+        } as unknown as Category;
+      })
+    );
+  }
 
   getCategories(): Observable<Category[]> {
-    return of(this.categories);
+    const q = query(this.categoriesCollection, orderBy('name'));
+    return collectionData(q, { idField: 'id' }) as Observable<Category[]>;
   }
 
-  addCategory(category: Category): void {
-    this.categories.push(category);
+  getCategory(id: number | string): Observable<Category | undefined> {
+    const categoryDocRef = doc(this.firestore, `categories/${id}`);
+    return from(getDoc(categoryDocRef)).pipe(
+      map(docSnapshot => {
+        if (docSnapshot.exists()) {
+          return { id: docSnapshot.id, ...docSnapshot.data() } as unknown as Category;
+        }
+        return undefined;
+      })
+    );
   }
 
-  deleteCategory(id: number): void {
-    this.categories = this.categories.filter(cat => cat.id !== id);
+  updateCategory(category: Category): Observable<void> {
+    const categoryDocRef = doc(this.firestore, `categories/${category.id}`);
+    const categoryData = {
+        name: category.name,
+        description: category.description
+    };
+    return from(updateDoc(categoryDocRef, categoryData));
+  }
+
+  deleteCategory(id: number | string): Observable<void> {
+    const categoryDocRef = doc(this.firestore, `categories/${id}`);
+    return from(deleteDoc(categoryDocRef));
   }
 }
