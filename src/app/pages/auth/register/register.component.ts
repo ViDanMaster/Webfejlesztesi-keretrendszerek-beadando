@@ -70,7 +70,6 @@ export class RegisterComponent {
       error: (error) => {
         console.error('Registration error details:', error);
         
-        // More specific error handling
         if (error.code) {
           switch(error.code) {
             case 'auth/email-already-in-use':

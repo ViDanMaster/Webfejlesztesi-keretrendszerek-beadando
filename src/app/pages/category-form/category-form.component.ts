@@ -41,7 +41,6 @@ export class CategoryFormComponent implements OnInit {
   ngOnInit(): void {
     this.createForm();
     
-    // Check if we're in edit mode
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
@@ -77,7 +76,6 @@ export class CategoryFormComponent implements OnInit {
     const formValue = this.categoryForm.value;
     
     if (this.isEditMode && this.categoryId) {
-      // Update existing category
       const category: Category = {
         id: this.categoryId,
         name: formValue.name,
@@ -93,15 +91,14 @@ export class CategoryFormComponent implements OnInit {
         }
       });
     } else {
-      // Create new category with temporary ID (will be replaced by Firestore)
       const category: Category = {
-        id: 0, // Temporary, will be set by Firestore
+        id: 0,
         name: formValue.name,
         description: formValue.description
       };
       
       this.categoryService.addCategory(category).subscribe({
-        next: (newCategory) => {
+        next: () => {
           this.router.navigate(['/categories']);
         },
         error: (err) => {

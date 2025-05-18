@@ -1,4 +1,3 @@
-// filepath: c:\Users\vizid\Desktop\Angular\beadando\src\app\Services\Product.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, from, map, of } from 'rxjs';
 import { Product } from '../models/product.model';
@@ -9,20 +8,12 @@ import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, 
   providedIn: 'root',
 })
 export class ProductService {
-  // private productsCollection; // Ezt a sort távolítsd el vagy kommentezd ki
 
-  constructor(private firestore: Firestore) {
-    // this.productsCollection = collection(this.firestore, 'products'); // Ezt a sort távolítsd el vagy kommentezd ki
-    // this.seedProducts(); // Ha használtad a seedelést, győződj meg róla, hogy a this.firestore elérhető
-  }
+  constructor(private firestore: Firestore) {}
 
-  // CREATE
   addProduct(product: Product): Observable<Product> {
-    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const productsCollectionRef = collection(this.firestore, 'products');
     const newProduct = { ...product };
-    // Fontos: A Firestore dokumentum ID-k stringek. Ha a Product modelled 'id'-je szám,
-    // akkor itt konverziós problémák lehetnek, vagy a modellt kell string ID-re módosítani.
-    // Az egyszerűség kedvéért feltételezzük, hogy a Firestore generálja az ID-t.
     const productData = {
       name: newProduct.name,
       description: newProduct.description,
@@ -33,25 +24,23 @@ export class ProductService {
     return from(addDoc(productsCollectionRef, productData)).pipe(
       map(docRef => {
         return {
-          ...newProduct, // Ez tartalmazhatja az eredeti, ideiglenes ID-t
-          id: docRef.id // Ez a Firestore által generált string ID
-        } as unknown as Product; // Figyelj a típuskonverzióra, ha a Product.id szám
+          ...newProduct,
+          id: docRef.id
+        } as unknown as Product;
       })
     );
   }
 
-  // READ
   getProducts(): Observable<Product[]> {
-    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const productsCollectionRef = collection(this.firestore, 'products');
     return collectionData(productsCollectionRef, { idField: 'id' }) as Observable<Product[]>;
   }
 
-  getProduct(id: number | string): Observable<Product | undefined> { // Az ID lehet string is
+  getProduct(id: number | string): Observable<Product | undefined> {
     const productDocRef = doc(this.firestore, `products/${id}`);
     return from(getDoc(productDocRef)).pipe(
       map(docSnapshot => {
         if (docSnapshot.exists()) {
-          // Ha a Product.id szám, de a docSnapshot.id string, konvertálni kell, vagy a modellt módosítani
           return { id: docSnapshot.id, ...docSnapshot.data() } as unknown as Product;
         }
         return undefined;
@@ -59,9 +48,7 @@ export class ProductService {
     );
   }
 
-  // UPDATE
   updateProduct(product: Product): Observable<void> {
-    // Győződj meg róla, hogy product.id string, ha a Firestore dokumentum ID-jével dolgozol
     const productDocRef = doc(this.firestore, `products/${product.id}`);
     const productData = {
         name: product.name,
@@ -73,15 +60,13 @@ export class ProductService {
     return from(updateDoc(productDocRef, productData));
   }
 
-  // DELETE
-  deleteProduct(id: number | string): Observable<void> { // Az ID lehet string is
+  deleteProduct(id: number | string): Observable<void> { 
     const productDocRef = doc(this.firestore, `products/${id}`);
     return from(deleteDoc(productDocRef));
   }
 
-  // COMPLEX QUERY 1: Get products by category with ordering
   getProductsByCategory(categoryId: number): Observable<Product[]> {
-    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const productsCollectionRef = collection(this.firestore, 'products');
     const q = query(
       productsCollectionRef,
       where('categoryId', '==', categoryId),
@@ -90,7 +75,6 @@ export class ProductService {
     return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
   }
 
-  // COMPLEX QUERY 2: Filtered products with multiple conditions
   getFilteredProducts(filters: FilterOptions): Observable<Product[]> {
     const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
     let q = query(productsCollectionRef);
@@ -121,9 +105,8 @@ export class ProductService {
     );
   }
 
-  // COMPLEX QUERY 3: Get paginated products
   getPaginatedProducts(pageSize: number, lastVisible?: any): Observable<{products: Product[], lastVisible: any}> {
-    const productsCollectionRef = collection(this.firestore, 'products'); // Hozd létre itt
+    const productsCollectionRef = collection(this.firestore, 'products');
     let q;
     if (lastVisible) {
       q = query(
@@ -143,7 +126,7 @@ export class ProductService {
       map(snapshot => {
         const products: Product[] = [];
         const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-        snapshot.forEach(docSnapshot => { // Renamed 'doc' to 'docSnapshot'
+        snapshot.forEach(docSnapshot => {
           products.push({ id: docSnapshot.id, ...docSnapshot.data() } as unknown as Product);
         });
         return { products, lastVisible: lastDoc };
@@ -151,7 +134,6 @@ export class ProductService {
     );
   }
 
-  // COMPLEX QUERY 4: Get products with price range and sort order
   getProductsInPriceRangeWithSort(
     minPrice: number,
     maxPrice: number,

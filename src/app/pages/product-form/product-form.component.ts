@@ -33,7 +33,7 @@ export class ProductFormComponent implements OnInit {
   productForm!: FormGroup;
   categories: Category[] = [];
   isEditMode = false;
-  productId?: number;
+  productId?: string;
   pageTitle = 'Új termék hozzáadása';
   
   constructor(
@@ -48,13 +48,12 @@ export class ProductFormComponent implements OnInit {
     this.createForm();
     this.loadCategories();
     
-    // Check if we're in edit mode
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
-      this.productId = Number(id);
+      this.productId = id;
       this.pageTitle = 'Termék szerkesztése';
-      this.loadProduct(Number(id));
+      this.loadProduct(id);
     }
   }
   
@@ -74,9 +73,11 @@ export class ProductFormComponent implements OnInit {
     });
   }
   
-  loadProduct(id: number): void {
+  loadProduct(id: string): void { 
+    console.log('Loading product with ID:', id);
     this.productService.getProduct(id).subscribe(product => {
       if (product) {
+        console.log('Product loaded successfully:', product);
         this.productForm.patchValue({
           name: product.name,
           description: product.description,
@@ -84,6 +85,8 @@ export class ProductFormComponent implements OnInit {
           categoryId: product.categoryId,
           imageUrl: product.imageUrl
         });
+      } else {
+        console.error('Product not found with ID:', id);
       }
     });
   }
@@ -95,10 +98,12 @@ export class ProductFormComponent implements OnInit {
     
     const formValue = this.productForm.value;
     
+    console.log('Form submission - Edit mode:', this.isEditMode);
+    console.log('Product ID:', this.productId);
+    
     if (this.isEditMode && this.productId) {
-      // Update existing product
       const product: Product = {
-        id: this.productId?.toString() || '', // Konvertálás string-gé
+        id: this.productId,
         name: formValue.name,
         description: formValue.description,
         price: formValue.price,
@@ -106,8 +111,10 @@ export class ProductFormComponent implements OnInit {
         imageUrl: formValue.imageUrl
       };
       
+      console.log('Updating product:', product);
       this.productService.updateProduct(product).subscribe({
         next: () => {
+          console.log('Product updated successfully');
           this.router.navigate(['/products', this.productId]);
         },
         error: (err) => {
@@ -115,9 +122,8 @@ export class ProductFormComponent implements OnInit {
         }
       });
     } else {
-      // Create new product with temporary ID (will be replaced by Firestore)
       const product: Product = {
-        id: '', // Üres string, ami majd felülíródik a Firestore által generált ID-val
+        id: '',
         name: formValue.name,
         description: formValue.description,
         price: formValue.price,
@@ -125,8 +131,10 @@ export class ProductFormComponent implements OnInit {
         imageUrl: formValue.imageUrl
       };
       
+      console.log('Adding new product:', product);
       this.productService.addProduct(product).subscribe({
         next: (newProduct) => {
+          console.log('Product added successfully:', newProduct);
           this.router.navigate(['/products', newProduct.id]);
         },
         error: (err) => {

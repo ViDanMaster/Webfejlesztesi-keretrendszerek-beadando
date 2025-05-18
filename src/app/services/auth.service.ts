@@ -29,15 +29,12 @@ export class AuthService {
     private userService: UserService,
     private router: Router
   ) {
-    // Initialize the auth state
     this.isLoggedIn$ = this.currentUser$.pipe(
       map(user => !!user)
     );
 
-    // Monitor the authentication state
     onAuthStateChanged(this.auth, (firebaseUser) => {
       if (firebaseUser) {
-        // User is signed in, get their profile from Firestore
         this.getUserProfile(firebaseUser.uid).subscribe(user => {
           if (user) {
             this.currentUserSubject.next(user);
@@ -47,13 +44,11 @@ export class AuthService {
           }
         });
       } else {
-        // User is signed out
         this.currentUserSubject.next(null);
         localStorage.removeItem('currentUser');
       }
     });
 
-    // Check if user exists in localStorage for backward compatibility
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
@@ -70,14 +65,12 @@ export class AuthService {
       switchMap((credential: UserCredential) => {
         const firebaseUser = credential.user;
         
-        // Felhasználói adatok létrehozása
         const newUser: User = {
           id: firebaseUser.uid,
           name: name,
           email: firebaseUser.email || email,
         };
         
-        // Dokumentum létrehozása a felhasználó uid-jével
         const userDocRef = doc(this.firestore, `users/${newUser.id}`);
         return from(setDoc(userDocRef, {
           id: newUser.id,
@@ -87,7 +80,7 @@ export class AuthService {
           map(() => newUser),
           catchError(error => {
             console.error('Error creating user in Firestore:', error);
-            credential.user.delete(); // Töröld az auth fiókot, ha a Firestore doc létrehozása hibás
+            credential.user.delete();
             throw error;
           })
         );
@@ -103,11 +96,9 @@ export class AuthService {
     );
   }
 
-  // Sign in an existing user
   login(email: string, password: string): Observable<User | null> {
     return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
-      switchMap((credential: UserCredential) => {
-        // For this app, we'll just search for users by email
+      switchMap(() => {
         return this.userService.findUsersByEmail(email).pipe(
           map(users => users.length > 0 ? users[0] : null),
           catchError(error => {
@@ -129,7 +120,6 @@ export class AuthService {
     );
   }
 
-  // Sign out the current user
   logout(): Observable<void> {
     return from(signOut(this.auth)).pipe(
       tap(() => {
@@ -144,19 +134,20 @@ export class AuthService {
     );
   }
 
-  // Get the current auth state
   getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      return JSON.parse(userData);
+    }
+    return null;
   }
 
-  // Get the user profile from Firestore based on Firebase UID
   getUserProfile(userId: string): Observable<User | null> {
     return this.userService.getUserById(userId).pipe(
       map(user => user === undefined ? null : user)
     );
   }
 
-  // Check if user is logged in
   isLoggedIn(): boolean {
     return !!this.currentUserSubject.value;
   }
@@ -167,15 +158,9 @@ export class AuthService {
         observer.error('No authenticated user found');
         return;
       }
-      
-      // First, verify the user's current credentials (optional but recommended)
-      // This would require getting the password from the user
 
-      // Send verification email to the new email address
       const user = this.auth.currentUser;
       
-      // Using verifyBeforeUpdateEmail instead of updateEmail
-      // This sends a verification email to the new address
       import('firebase/auth').then(({ verifyBeforeUpdateEmail }) => {
         verifyBeforeUpdateEmail(user, newEmail)
           .then(() => {

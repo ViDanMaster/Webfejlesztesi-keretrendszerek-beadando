@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
   filteredProducts: Product[] = [];
   selectedCategory: number | null = null;
   currentSearchTerm: string | null = null;
-  isHomePage = true; // Track if we're on the home page
+  isHomePage = true;
   
   currentFilters: FilterOptions = {
     categoryId: null,
@@ -57,11 +57,9 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.loadAllProducts();
     
-    // Monitor route changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      // Check if we're on the home page
       this.isHomePage = event.url === '/' || event.url === '/home';
       this.cdr.detectChanges();
     });
@@ -94,7 +92,6 @@ export class AppComponent implements OnInit {
     this.onFiltersChanged(updatedFilters);
     this.cdr.detectChanges();
     
-    // Navigate to home when searching
     if (!this.isHomePage) {
       this.router.navigate(['/home']);
     }

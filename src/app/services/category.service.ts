@@ -13,7 +13,6 @@ export class CategoryService {
     this.categoriesCollection = collection(this.firestore, 'categories');
   }
 
-  // CREATE
   addCategory(category: Category): Observable<Category> {
     const newCategory = { ...category };
     const categoryData = {
@@ -30,10 +29,8 @@ export class CategoryService {
     );
   }
 
-  // READ
   getCategories(): Observable<Category[]> {
     const q = query(this.categoriesCollection, orderBy('name'));
-    // A figyelmeztetés valószínűleg erre a collectionData hívásra mutatott
     return collectionData(q, { idField: 'id' }) as Observable<Category[]>;
   }
 
@@ -49,7 +46,6 @@ export class CategoryService {
     );
   }
 
-  // UPDATE
   updateCategory(category: Category): Observable<void> {
     const categoryDocRef = doc(this.firestore, `categories/${category.id}`);
     const categoryData = {
@@ -59,7 +55,6 @@ export class CategoryService {
     return from(updateDoc(categoryDocRef, categoryData));
   }
 
-  // DELETE
   deleteCategory(id: number | string): Observable<void> {
     const categoryDocRef = doc(this.firestore, `categories/${id}`);
     return from(deleteDoc(categoryDocRef));

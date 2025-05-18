@@ -79,7 +79,6 @@ export class CategoryListComponent implements OnInit {
     const formValue = this.categoryForm.value;
     
     if (this.isEditMode && this.currentCategoryId !== null) {
-      // Update
       const category: Category = {
         id: this.currentCategoryId,
         name: formValue.name,
@@ -98,9 +97,8 @@ export class CategoryListComponent implements OnInit {
         }
       });
     } else {
-      // Create
       const category: Category = {
-        id: 0, // Temporary, will be set by Firestore
+        id: 0,
         name: formValue.name,
         description: formValue.description
       };

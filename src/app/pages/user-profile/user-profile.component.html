@@ -1,30 +1,82 @@
 <div class="profile-container" *ngIf="user">
-  <h1>Értékelések</h1>
   
-  <div class="top-products">
+  <!-- User Reviews Section -->
+  <div class="user-reviews">
+    <h2>Saját értékeléseim</h2>
     
-    <div class="products-grid">
-      <mat-card *ngFor="let item of topRatedProducts" class="product-card">
-        <img [src]="item.product.imageUrl" [alt]="item.product.name" class="product-image">
+    <div *ngIf="isLoadingReviews" class="loading-reviews">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Értékelések betöltése...</p>
+    </div>
+    
+    <div *ngIf="!isLoadingReviews && userReviews.length === 0" class="no-reviews">
+      <p>Még nem írtál értékelést.</p>
+    </div>
+    
+    <div class="reviews-list">
+      <mat-card *ngFor="let review of userReviews" class="review-card">
+        <div class="review-product" *ngIf="review.product">
+          <img [src]="review.product.imageUrl" [alt]="review.product.name" class="product-thumbnail">
+          <div class="product-info">
+            <h3><a [routerLink]="['/products', review.productId]">{{review.product.name}}</a></h3>
+            <p class="review-date">Értékelés dátuma: {{review.date | date:'yyyy. MM. dd.'}}</p>
+          </div>
+        </div>
         
-        <div class="product-info">
-          <h3>
-            <a [routerLink]="['/products', item.product.id]">{{item.product.name}}</a>
-          </h3>
-          
+        <div class="review-content" *ngIf="editingReviewId !== review.id">
           <div class="rating">
-            <mat-icon *ngFor="let star of getStarArray(item.rating)" class="star-icon">star</mat-icon>
-            <mat-icon *ngFor="let star of getEmptyStarArray(item.rating)" class="star-icon">star_border</mat-icon>
-            <span class="rating-value">{{item.rating | number:'1.1-1'}}</span>
+            <mat-icon *ngFor="let star of getStarArray(review.rating)" class="star-icon">star</mat-icon>
+            <mat-icon *ngFor="let star of getEmptyStarArray(review.rating)" class="star-icon">star_border</mat-icon>
           </div>
           
-          <span class="product-price">{{item.product.price | currency:'HUF'}}</span>
+          <p class="review-comment">{{review.comment}}</p>
+          
+          <div class="review-actions">
+            <button mat-button color="primary" (click)="startEditReview(review)">
+              <mat-icon>edit</mat-icon> Szerkesztés
+            </button>
+            <button mat-button color="warn" (click)="confirmDeleteReview(review)">
+              <mat-icon>delete</mat-icon> Törlés
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-edit" *ngIf="editingReviewId === review.id && editReviewForm">
+          <form [formGroup]="editReviewForm" (ngSubmit)="saveReview()">
+            <div class="rating-selection">
+              <div class="rating-stars-input">
+                <mat-icon 
+                  *ngFor="let i of [1,2,3,4,5]" 
+                  (click)="editReviewForm.get('rating')?.setValue(i)"
+                  [class.selected]="editReviewForm.get('rating')?.value >= i">
+                  {{editReviewForm.get('rating')?.value >= i ? 'star' : 'star_border'}}
+                </mat-icon>
+              </div>
+            </div>
+            
+            <div class="comment-edit">
+              <textarea 
+                formControlName="comment" 
+                rows="4" 
+                placeholder="Írja le a véleményét..."></textarea>
+              <div class="form-error" *ngIf="editReviewForm.get('comment')?.invalid && editReviewForm.get('comment')?.touched">
+                A vélemény legalább 3 karakter hosszú kell, hogy legyen.
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button mat-button type="button" (click)="cancelEditReview()">Mégsem</button>
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="editReviewForm.invalid">
+                Mentés
+              </button>
+            </div>
+          </form>
         </div>
       </mat-card>
-      
-      <div *ngIf="topRatedProducts.length === 0" class="no-products">
-        <p>Még nincsenek értékelt termékek.</p>
-      </div>
     </div>
   </div>
 </div>

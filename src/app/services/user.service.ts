@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, catchError, throwError, switchMap } from 'rxjs';
+import { Observable, from, map, catchError, throwError, switchMap, of } from 'rxjs';
 import { User } from '../models/user.model';
 import { 
   Firestore, 
@@ -50,7 +50,6 @@ export class UserService {
     );
   }
 
-  // READ
   getUsers(): Observable<User[]> {
     return collectionData(this.usersCollection, { idField: 'id' }) as Observable<User[]>;
   }
@@ -59,17 +58,22 @@ export class UserService {
     console.log('Getting user with ID:', id);
     console.log('Auth state:', this.auth.currentUser?.uid);
     
-    const userDocRef = doc(this.firestore, `users/${id}`);
+    if (!id) {
+      return of(null);
+    }
     
-    return from(getDoc(userDocRef)).pipe(
+    const userDoc = doc(this.firestore, `users/${id}`);
+    return from(getDoc(userDoc)).pipe(
       map(docSnap => {
         if (docSnap.exists()) {
-          const userData = docSnap.data() as User;
-          return userData;
-        } else {
-          console.log('No user document found with ID:', id);
-          return null;
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            name: data['name'] || 'Anonymous',
+            email: data['email'],
+          } as User;
         }
+        return null;
       })
     );
   }
@@ -115,7 +119,6 @@ export class UserService {
     }));
   }
 
-  // DELETE
   deleteUser(id: number): Observable<void> {
     const userDoc = doc(this.firestore, `users/${id}`);
     return from(deleteDoc(userDoc));
