@@ -22,22 +22,12 @@ export class FilterSidebarComponent implements OnInit {
     minPrice: null,
     maxPrice: null,
     searchTerm: null,
-    onlyFavorites: false
   };
   
   @Input() set searchTerm(value: string | null) {
     if (value !== this.filters.searchTerm) {
       this.filters.searchTerm = value;
     }
-  }
-
-  @Input() set onlyFavorites(value: Boolean) {
-    if (value !== undefined) {
-      this.filters.onlyFavorites = value;
-    } else {
-      this.filters.onlyFavorites = false;
-    }
-    console.log('FilterSidebarComponent onlyFavorites:', this.filters.onlyFavorites);
   }
   
   @Output() filtersChanged = new EventEmitter<FilterOptions>();
@@ -73,7 +63,6 @@ export class FilterSidebarComponent implements OnInit {
       minPrice: null,
       maxPrice: null,
       searchTerm: null,
-      onlyFavorites: Boolean(false)
     };
     this.emitFilters();
   }

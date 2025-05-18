@@ -104,7 +104,7 @@ export class AppComponent implements OnInit {
       categoryId: categoryId,
       minPrice: null,
       maxPrice: null,
-      searchTerm: this.currentSearchTerm
+      searchTerm: this.currentSearchTerm,
     };
     
     this.onFiltersChanged(filters);

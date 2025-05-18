@@ -1,11 +1,10 @@
 export class Product {
   constructor(
-    public id: string, // Módosítsd string vagy number típusra
+    public id: string,
     public name: string,
     public description: string,
     public price: number,
     public categoryId: number,
     public imageUrl: string,
-    public isFavorite: boolean = false,
   ) {}
 }

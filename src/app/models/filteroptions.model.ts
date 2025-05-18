@@ -3,5 +3,4 @@ export interface FilterOptions {
   minPrice: number | null;
   maxPrice: number | null;
   searchTerm: string | null;
-  onlyFavorites: Boolean;
 }
